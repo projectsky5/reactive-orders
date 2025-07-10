@@ -1,5 +1,6 @@
 package com.projectsky.reactiveorders.service;
 
+import com.projectsky.reactiveorders.dto.OrderCreateDto;
 import com.projectsky.reactiveorders.exception.OrderNotFoundException;
 import com.projectsky.reactiveorders.model.Order;
 import com.projectsky.reactiveorders.repository.OrderRepository;
@@ -8,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -29,11 +32,17 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
-    public void saveAndNotify(Order order) {
-        orderRepository.save(order)
+    public Mono<Order> saveAndNotify(OrderCreateDto dto) {
+        Order order = Order.builder()
+                .productId(dto.productId())
+                .quantity(dto.quantity())
+                .build();
+
+
+        return orderRepository.save(order)
                 .doOnSuccess(savedOrder -> { // побочный эффект при успешной операции + создается новый Publisher
                     log.info("Новый заказ сохранен: {}", savedOrder);
-                }).subscribe(); // Явная подписка с побочным эффектом на новый Publisher, можно еще в контроллере
+                });
     }
 
     @Override

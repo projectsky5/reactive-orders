@@ -1,5 +1,6 @@
 package com.projectsky.reactiveorders.service;
 
+import com.projectsky.reactiveorders.dto.ProductCreateDto;
 import com.projectsky.reactiveorders.exception.ProductNotFoundException;
 import com.projectsky.reactiveorders.model.Product;
 import com.projectsky.reactiveorders.repository.ProductRepository;
@@ -39,8 +40,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    @CachePut(value = "productsByName", key = "#product.name")
-    public Mono<Product> save(Product product) {
+    @CachePut(value = "productsByName", key = "#dto.name")
+    public Mono<Product> save(ProductCreateDto dto) {
+        Product product = Product.builder()
+                .name(dto.name())
+                .description(dto.description())
+                .price(dto.price())
+                .build();
+
         return productRepository.save(product)
                 .doOnSuccess(savedProduct -> {
                     log.info("Создан продукт={}", savedProduct.getName());
@@ -54,6 +61,7 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findByNameContainsIgnoreCase(name);
     }
 
+    @Override
     public Flux<Product> getHotNewProducts() {
         return hotNewProducts.asFlux();
     }
