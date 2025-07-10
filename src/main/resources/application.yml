@@ -25,10 +25,10 @@ logging:
     org.springframework.r2dbc: DEBUG
     io.r2dbc: DEBUG
 
-management:
-    tracing:
-      enabled: false
-    metrics:
-      export:
-        otlp:
-          enabled: false
+#management:
+#    tracing:
+#      enabled: false
+#    metrics:
+#      export:
+#        otlp:
+#          enabled: false
